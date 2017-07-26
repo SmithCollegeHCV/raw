@@ -1,3 +1,4 @@
+
 'use strict';
 
 /* Controllers */
@@ -435,8 +436,9 @@ angular.module('raw.controllers', [])
 
     $scope.codeMirrorOptions = {
       dragDrop : false,
-      lineNumbers : true,
-      lineWrapping : true
+      lineNumbers : false,
+      lineWrapping : true,
+      styleActiveLine: true
     }
 
     $scope.selectChart = function(chart){
