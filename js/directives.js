@@ -256,14 +256,20 @@ angular.module('raw.directives', [])
 	        function ordinalUpdate(domain) {
 	        	if (!domain.length) domain = [null];
 	        	this.value.domain(domain);
+	        	
+	        	//console.log(scope.model.dimensions())
+	        	//console.log(scope.data)
 	        	listColors();
 	        }
 
 	        function linearUpdate(domain) {
+
 	        	domain = d3.extent(domain, function (d){return +d; });
+	        	console.log(scope)
+	        	console.log(domain);
 	        	if (domain[0]==domain[1]) domain = [null];
 	        	this.value.domain(domain).interpolate(d3.interpolateLab);
-	        	listColors();
+	        	//listColors();
 	        }
 
 	        scope.setScale = function(){
@@ -284,6 +290,7 @@ angular.module('raw.directives', [])
 
 	        scope.$watch('chart', addListener)
 					scope.$watch('colorScale.value.domain()',function (domain){
+						
 						scope.colorScale.reset(domain);
 						listColors();
 					}, true);
@@ -509,8 +516,8 @@ angular.module('raw.directives', [])
     	var sortBy,
     			descending = true;
 
-    	function update(){
-
+    	function update(){ //Updates table
+    		
     		d3.select(element[0]).selectAll("*").remove();
 
     		if(!scope.data|| !scope.data.length) {
@@ -524,12 +531,12 @@ angular.module('raw.directives', [])
 
     		if (!sortBy) sortBy = scope.metadata[0].key;
 
-    		var headers = table.append("thead")
+    		var headers = table.append("thead") //table headers
     			.append("tr")
 					.selectAll("th")
 					.data(scope.metadata)
 					.enter().append("th")
-						.text( function(d){ return d.key; } )
+						.text( function(d){ return d.key; } ) //table header text
 						.on('click', function (d){
 							descending = sortBy == d.key ? !descending : descending;
 							sortBy = d.key;
@@ -549,6 +556,9 @@ angular.module('raw.directives', [])
 					.data(d3.values)
 					.enter().append("td");
 					cells.text(String);
+				for (var i = 0; i<element.length;i++){
+					console.log(element[i]);
+				}
 
     	}
 
@@ -556,7 +566,15 @@ angular.module('raw.directives', [])
     		if (raw.isNumber(a[sortBy]) && raw.isNumber(b[sortBy])) return descending ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy];
 	      return descending ? a[sortBy] < b[sortBy] ? -1 : a[sortBy] > b[sortBy] ? 1 : 0 : a[sortBy] < b[sortBy] ? 1 : a[sortBy] > b[sortBy] ? -1 : 0;
     	}
-
+    	    ///
+	    scope.$watch(function() {return element.attr('Class'); }, function(newValue){
+	      console.log("changed highlight")
+	    });
+	    	    ///
+	    // $scope.$watch(function() {return element.attr('.CodeMirror-activeline'); }, function(newValue){
+	    //   console.log("changed highlight")
+	    // });
+	    ///
     	scope.$watch('data', update);
     	scope.$watch('metadata', function(){
     		sortBy = null;

@@ -392,7 +392,7 @@ angular.module('raw.controllers', [])
 
         $timeout(function() {
           $scope.charts = raw.charts.values().sort(function (a,b){ return d3.ascending(a.category(),b.category()) || d3.ascending(a.title(),b.title()) })
-          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Scatter Plot'})[0];
+          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Circle Packing'})[0]; //Sets default selection
           $scope.model = $scope.chart ? $scope.chart.model() : null;
         });
       } catch(e){
@@ -433,6 +433,20 @@ angular.module('raw.controllers', [])
         angular.element(this).scope().$apply();
       })
     })
+
+    $('body').mousedown(function (e,ui){
+      if ($(e.target).hasClass("CodeMirror-line")) {
+        console.log($(e.target)[0].innerText);
+        // return;
+      }
+      // $('.dimensions-wrapper').each(function (e){
+      //   angular.element(this).scope().open = false;
+      //   angular.element(this).scope().$apply();
+      // })
+    });
+    // $('body').on('change','.CodeMirror-activeline',function(){
+    //   console.log("foundActiveLineEvent");
+    // })
 
     $scope.codeMirrorOptions = {
       dragDrop : false,
