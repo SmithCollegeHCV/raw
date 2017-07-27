@@ -435,8 +435,25 @@ angular.module('raw.controllers', [])
     })
 
     $('body').mousedown(function (e,ui){
-      if ($(e.target).hasClass("CodeMirror-line")) {
-        console.log($(e.target)[0].innerText);
+
+
+      if ($(e.target).hasClass("CodeMirror-line") || $(e.target).parent().hasClass("CodeMirror-line") ) {
+        let text = "";
+        if ($(e.target)[0].innerText){
+          text = $(e.target)[0].innerText;
+        }else{
+          text = e.innerText;
+        }
+        var split = text.split(",")
+        var circles = d3.selectAll("circle").filter(function(d){ if (d.name == split[0]) return d;});
+            circles
+              .style("fill", "green");
+
+
+            
+        console.log($scope.chart)
+        console.log(text);
+        console.log(circles.data())
         // return;
       }
       // $('.dimensions-wrapper').each(function (e){

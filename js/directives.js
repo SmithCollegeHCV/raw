@@ -134,13 +134,14 @@ angular.module('raw.directives', [])
 	      link: function postLink(scope, element, attrs) {
 
 	        function update(){
+	        	console.log("update?");
 	        	$('*[data-toggle="tooltip"]').tooltip({ container:'body' });
 
 	        	d3.select(element[0]).select("*").remove();
 
 	        	if (!scope.chart || !scope.data.length) return;
 						if (!scope.model.isValid()) return;
-
+				console.log(scope.data)
 	        	d3.select(element[0])
 	        		.append("svg")
 	        		.datum(scope.data)
@@ -160,7 +161,6 @@ angular.module('raw.directives', [])
 										}
 									})
 							)
-
 	    			scope.svgCode = d3.select(element[0])
 	        			.select('svg')
 	    				.attr("xmlns", "http://www.w3.org/2000/svg")
@@ -269,7 +269,7 @@ angular.module('raw.directives', [])
 	        	console.log(domain);
 	        	if (domain[0]==domain[1]) domain = [null];
 	        	this.value.domain(domain).interpolate(d3.interpolateLab);
-	        	//listColors();
+	        	listColors();
 	        }
 
 	        scope.setScale = function(){
@@ -305,6 +305,7 @@ angular.module('raw.directives', [])
 	        }
 
 	        scope.setColor = function(key, color) {
+	        	console.log(scope.data)
 	          var domain = scope.colorScale.value.domain(),
 	          		index = domain.indexOf(key),
 	          		range = scope.colorScale.value.range();

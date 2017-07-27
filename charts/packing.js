@@ -67,7 +67,9 @@
             .attr("class", function (d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
             .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
             .attr("r", function (d) { return d.r; })
-            .style("fill", function (d) { return !d.children ? colors()(d.color) : ''; })
+            .style("fill", function (d) {
+            	//console.log(d)
+            	return !d.children ? colors()(d.color) : ''; })
             .style("fill-opacity", function (d){ return !d.children ? 1 : 0; })
             .style("stroke", '#ddd')
             .style("stroke-opacity", function (d) { return !d.children ? 0 : 1 })
