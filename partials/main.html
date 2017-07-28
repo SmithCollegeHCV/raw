@@ -193,11 +193,11 @@
 
 		</section>
 		<div id="wrapper" style="text-align: center" data-ng-show="!error && data.length && parsed">    
-    		<a href="" ng-init="open=true" ng-click="open=!open" style="display: inline-block;">Open Chart Select</a>
+    		<a href="" ng-init="chart_toggle=true" ng-click="chart_toggle=!chart_toggle;" style="display: inline-block;">{{chart_toggle_text}}</a>
 		</div>
-		
+		<!-- open ? toggle-text='Open Charts' : toggle-text='Close Charts' -->
 <!-- data-ng-show="!error && data.length && parsed" -->
-		<section class="dark"  data-ng-show="!error && data.length && parsed && open">
+		<section class="dark"  data-ng-show="!error && data.length && parsed && chart_toggle">
 
 			<div class="container">
 
@@ -275,8 +275,10 @@
 			</div>
 
 		</section>
-
-		<section class="" data-ng-show="!error && data.length && parsed">
+		<div id="wrapper" style="text-align: center" data-ng-show="!error && data.length && parsed">    
+    		<a href="" ng-init="dimension_toggle=true" ng-click="dimension_toggle=!dimension_toggle;" style="display: inline-block;">{{dimension_toggle_text}}</a>
+		</div>
+		<section class="" data-ng-show="!error && data.length && parsed && dimension_toggle">
 
 			<div class="container">
 
