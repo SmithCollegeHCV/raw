@@ -436,7 +436,7 @@ angular.module('raw.controllers', [])
 
     $('body').mousedown(function (e,ui){
 
-
+      var previous_attributes;
       if ($(e.target).hasClass("CodeMirror-line") || $(e.target).parent().hasClass("CodeMirror-line") ) {
         let text = "";
         if ($(e.target)[0].innerText){
@@ -446,16 +446,41 @@ angular.module('raw.controllers', [])
         }
         var split = text.split(",")
         var circles = d3.selectAll("circle").filter(function(d){ if (d.name == split[0]) return d;});
+        //previous_attributes = circles.
             circles
               .style("fill", "green");
-
-
-            
-        console.log($scope.chart)
-        console.log(text);
-        console.log(circles.data())
+        // console.log($scope.chart)
+        // console.log(text);
+        // console.log(circles.data())
         // return;
       }
+
+      // var $divs = $(".CodeMirror-code").children();
+      var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+              if (mutation.attributeName === "class") {
+                  var attributeValue = $(mutation.target).prop(mutation.attributeName);
+                  //console.log("Class attribute changed to:", attributeValue);
+                  if (attributeValue == "CodeMirror-activeline"){
+                    console.log(mutation.target);
+                  }
+                  
+                  //if (attributeValue == "CodeMirror-activeline")
+              }
+          });
+      });    
+      observer.observe(document,  {attributes: true, subtree: true});
+
+
+
+
+
+
+
+
+
+
+
       // $('.dimensions-wrapper').each(function (e){
       //   angular.element(this).scope().open = false;
       //   angular.element(this).scope().$apply();

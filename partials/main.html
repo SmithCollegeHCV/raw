@@ -192,9 +192,12 @@
 			</div>
 
 		</section>
-
-
-		<section class="dark" data-ng-show="!error && data.length && parsed">
+		<div id="wrapper" style="text-align: center" data-ng-show="!error && data.length && parsed">    
+    		<a href="" ng-init="open=true" ng-click="open=!open" style="display: inline-block;">Open Chart Select</a>
+		</div>
+		
+<!-- data-ng-show="!error && data.length && parsed" -->
+		<section class="dark"  data-ng-show="!error && data.length && parsed && open">
 
 			<div class="container">
 
