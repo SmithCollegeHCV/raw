@@ -3,12 +3,6 @@
 
 /* Controllers */
 
-
-
-
-
-
-
 angular.module('raw.controllers', [])
 
   .controller('RawCtrl', function ($scope, dataService, $http, $timeout, $sce) {
@@ -461,46 +455,21 @@ angular.module('raw.controllers', [])
         // return;
       }
 
-      //$scope.charts-open = true;
-      $scope.$watch('chart_toggle', function(){
-        $scope.chart_toggle_text = $scope.chart_toggle ? 'Hide Charts' : 'Show Charts';
-      })
-      $scope.$watch('dimension_toggle', function(){
-        $scope.dimension_toggle_text = $scope.dimension_toggle ? 'Hide Dimensions' : 'Show Dimensions';
-      })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       // var $divs = $(".CodeMirror-code").children();
-      var observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-              if (mutation.attributeName === "class") {
-                  var attributeValue = $(mutation.target).prop(mutation.attributeName);
-                  //console.log("Class attribute changed to:", attributeValue);
-                  if (attributeValue == "CodeMirror-activeline"){
-                    console.log(mutation.target);
-                  }
+      // var observer = new MutationObserver(function(mutations) {
+      //     mutations.forEach(function(mutation) {
+      //         if (mutation.attributeName === "class") {
+      //             var attributeValue = $(mutation.target).prop(mutation.attributeName);
+      //             //console.log("Class attribute changed to:", attributeValue);
+      //             if (attributeValue == "CodeMirror-activeline"){
+      //               console.log(mutation.target);
+      //             }
                   
-                  //if (attributeValue == "CodeMirror-activeline")
-              }
-          });
-      });    
-      observer.observe(document,  {attributes: true, subtree: true});
+      //             //if (attributeValue == "CodeMirror-activeline")
+      //         }
+      //     });
+      // });    
+      // observer.observe(document,  {attributes: true, subtree: true});
 
 
 
