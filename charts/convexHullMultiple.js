@@ -1,4 +1,4 @@
-(function () {
+(function(){
 
     var model = raw.model();
 
@@ -42,7 +42,6 @@
         return nest;
 
     })
-
 
     var chart = raw.chart()
         .title('Convex Hull')

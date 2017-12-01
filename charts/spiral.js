@@ -1,4 +1,6 @@
-(function(
+(function(){
+    // newly added
+    var model = raw.model();
 
     var width = 500,
         height = 500,
@@ -7,14 +9,25 @@
         numSpirals = 3
         margin = {top:50,bottom:50,left:50,right:50};
 
-        var theta = function(r) {
-          return numSpirals * Math.PI * r;
+    var theta = function(r) {
+      return numSpirals * Math.PI * r;
     };
+
+
+    // newly added (create chart)
+    var chart = raw.chart()
+        .title("Time Series Spiral Plot")
+        .description("Can use bars,lines or points to be displayed along the spiral path, usually used to ")
+        .thumbnail("imgs/conspiral.png") //need to add conspiral example oas png file
+        .model(model)
+        .category('Condegram') // need to check what category implies for
+
 
     // used to assign nodes color by group
     var color = d3.scaleOrdinal(d3.schemeCategory10);
 
     var r = d3.min([width, height]) / 2 - 40;
+
 
     var radius = d3.scaleLinear()
       .domain([start, end])
@@ -168,14 +181,6 @@
         tooltip.style('display', 'none');
         tooltip.style('opacity',0);
     });
-
-
-
-
-
-
-
-
-){})();
+})();
 
 
