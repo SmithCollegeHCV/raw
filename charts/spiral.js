@@ -1,88 +1,72 @@
 (function(){
-    // newly added
-    var model = raw.model();
 
-    // Group dimension. It will mainly provide a label for each
-      // chart. If multiple lines share the same value in the
-      // group dimension, they will be grouped.
-    var group = model.dimension()
-       .title('Label');
+  var spiral = raw.model();
+  
+  var date = spiral.dimension()
+    .title('Date')
+        .types(Date)
+        .accessor(function (d){ return this.type() == "Date" ? Date.parse(d) : +d; })
+        .required(1)
 
-    // 'Dimensions' dimension. accept multiple values.
-    // Each value represent a slice of the pie.
-    var dimensions = model.dimension()
-       .title('Arcs')
-       .required(true)
-       .multiple(true);
-
-    // Mapping function.
-    // For each record in the dataset a pie chart abstraction is created.
-    // Records are grouped according the 'group' variable.
-
-    model.map(function(data) {
-
-        // Check if dimensions are set.
-        // In theory should be not necessary, to be fixed.
-        if(dimensions() != null){
-
-          var index = 0;
-          var nest = d3.nest()
-            // If groups are not defined, assign a number to each record.
-            .key(function(d) {
-              return group() ? group(d) : ++index; })
-            .rollup(function(d) {
-              return dimensions().map(function(dimension) {
-                return { key: dimension, size: d3.sum(d, function(a) {
-                    return +a[dimension]; }) }
-              })
-            })
-            .entries(data);
-
-          return nest;
-        }
-
-    })
-
-
-    // newly added (create chart object)
-    var chart = raw.chart()
-        .title("Time Series Spiral Plot")
-        .description("Can use bars,lines or points to be displayed along the spiral path, usually used to ")
-        .thumbnail("imgs/conspiral.png") //need to add conspiral example oas png file
-        .model(model)
-        .category('Other') // need to check what category implies for
-
-
-    var width = chart.number()
-		.title('Width')
-		.defaultValue(500)
-		.fitToWidth(true)
-
-	var height = chart.number()
-		.title("Height")
-		.defaultValue(500)
-
-	var padding = chart.number()
-		.title("Padding")
-		.defaultValue(5)
-
-	var start = chart.number()
+  //start point
+	var start = spiral.dimension()
 		.title("Start")
+    .types(Number)
 		.defaultValue(0)
 
-	var end = chart.number()
+	var end = spiral.dimension()
 		.title("End")
+    .types(Number)
 		.defaultValue(2.25)
 
-	var numSpirals = chart.number()
+	var numSpirals = spiral.dimension()
 		.title("numSpirals")
+    .types(Number)
 		.defaultValue(3)
 
 
-
-	var margin = chart.number()
-	    .title("margin")
+	var margin = spiral.number()
+	  .title("margin")
+    .types(Number)
 		.defaultValue(50) // set default margin to 50
+
+
+  // Map data
+  spiral.map(function (data) {
+  
+    return data.map(function (d){
+      return {
+        date  : date(d),
+        start : start(d),
+        end : end(d),
+        numSpirals: numSpirals(d),
+        margin: margin(d)
+      }
+    })
+  
+  });
+
+
+  // newly added (create chart object)
+  var chart = raw.chart()
+      .title("Time Series Spiral Plot")
+      .description("Can use bars,lines or points to be displayed along the spiral path, usually used to ")
+      .thumbnail("imgs/conspiral.png") //need to add conspiral example oas png file
+      .model(spiral)
+      .category('Other/Time Series') // need to check what category implies for
+
+  var width = chart.number()
+      .title('Width')
+      .defaultValue(500)
+      .fitToWidth(true)
+
+  var height = chart.number()
+      .title("Height")
+      .defaultValue(500)
+
+  var padding = spiral.number()
+      .title("Padding")
+      .defaultValue(5)
 
 
   chart.draw(function(selection, data) {
@@ -94,11 +78,9 @@
 
       var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-
       var theta = function(r) {
         return numSpirals * Math.PI * r;
       };
-
 
        var svg = d3.select("#chart").append("svg")
           .attr("width", width + margin + margin)
