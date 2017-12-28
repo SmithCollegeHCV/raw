@@ -206,7 +206,9 @@ angular.module('raw.controllers', [])
       { title : 'Orchestras', type : 'Hierarchies (weighted)', url : 'data/orchestra.csv' },
       { title : 'Animal kingdom', type: 'Hierarchies', url : 'data/animals.tsv' },
       { title : 'Titanic\'s passengers', type : 'Multi categorical', url : 'data/titanic.tsv' },
-      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'}
+      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'},
+      { title : 'Miserable', type : 'Other', url : 'data/miserable.csv'},
+//      { title : 'Graph', type : 'Other', url : 'data/graph.json'}
     ]
 
     $scope.selectSample = function(sample) {
@@ -216,7 +218,12 @@ angular.module('raw.controllers', [])
       $scope.loading = true;
       dataService.loadSample(sample.url).then(
         function(data){
-          $scope.text = data.replace(/\r/g, '');
+          if (typeof(data) == 'string'){
+            $scope.text = data.replace(/\r/g, '');
+          }
+          else {
+              $scope.text = data;
+          }
           $scope.loading = false;
         },
         function(error){

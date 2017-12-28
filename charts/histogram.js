@@ -58,7 +58,6 @@
                 return d.key;
             }))
         
-        
         var y = d3.scale.linear().domain([d3.min(bins, function(d) { return d.y; }), d3.max(bins, function(d) { return d.y; })]).range([(heightNum - 20), 0]);
 		
 		var xAxis = d3.svg.axis()
@@ -89,7 +88,7 @@
         
         g.append("g")
             .attr("class", "x axis")
-			.attr("transform", "translate(0," + heightNum + ")")
+//			.attr("transform", "translate(0," + heightNum + ")")
 			.call(xAxis);
         })
 
