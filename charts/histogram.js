@@ -88,8 +88,11 @@
         
         g.append("g")
             .attr("class", "x axis")
-//			.attr("transform", "translate(0," + heightNum + ")")
+			.attr("transform", "translate(0," + (heightNum - 20) + ")")
 			.call(xAxis);
+        
+        selection.select('path')
+            .style({ 'stroke': 'black', 'fill': 'none', 'stroke-width': '1px'});
         })
 
 }()
