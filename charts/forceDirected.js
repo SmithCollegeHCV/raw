@@ -1,48 +1,37 @@
 !function(){
     var model = raw.model();
     var formatCount = d3.format(",.0f");
-        
-    var group = model.dimension()
-        .title('Group')
-        .required(true)
-        .multiple(true)
-        .types(Number);
-    
-    var nodes = model.dimension()
-        .title('Nodes')
-        .required(true)
-        .multiple(true);
     
     var source = model.dimension()
         .title('Source')
-        .required(true)
-        .multiple(true);
+        .required(true);
     
     var target = model.dimension()
         .title('Target')
-        .required(true)
-        .multiple(true);
-    
-    var value = model.dimension()
-        .title('Value')
-        .required(true)
-        .multiple(true)
-        .types(Number);
-   
+        .required(true);
+        
+    var weight = model.dimension()
+    	.title("Edge Weight")
+    	.types(Number)
+
     var color = d3.scale.ordinal(d3.schemeCategory20);
     
     model.map(function (data){
-        if (!group() || !nodes() || !source() || !target() || !value()) return [];
+        if (!source() || !target()) return [];
+        
+       var nodeList = jQuery.unique(data.map(function(d) {
+       			return source(d);
+       		}).concat(data.map(function(d) {
+       			return target(d);
+       		})));
 
-       var nodeList = data.map(function(d){
-            if ((nodes(d)) != " ") {
-                
+       var nodeList = nodeList.map(function(d){
                 return {
-                    "name" : nodes(d)[0],
-                    "group" : Number(group(d)[0])
+                    "name" : d
                 }
             }
-        });
+        );
+        
         nodeList = nodeList.filter(item => item !== undefined);
         
         var linkList = data.map(function(d){
@@ -50,21 +39,21 @@
                 
                 //find the index of source node.
                 var sourceNode = nodeList.filter(function(obj) {
-                  return obj.name == source(d)[0];
+                  return obj.name == source(d);
                 })[0];
                 var sourceIndex = nodeList.indexOf(sourceNode);
                 
                 //find the index of target node.
                 
                 var targetNode = nodeList.filter(function(obj) {
-                  return obj.name == target(d)[0];
+                  return obj.name == target(d);
                 })[0];
                 var targetIndex = nodeList.indexOf(targetNode);
                 
                 return {
                     "source" : sourceIndex,
                     "target" : targetIndex,
-                    "value" : Number(value(d)[0])
+                    "weight" : weight() ? weight(d) : 1
                 }
             }
         });
@@ -73,6 +62,7 @@
         var nest = {};
         nest['nodes'] = nodeList;
         nest['links'] = linkList;
+        
         return nest;
         
     })
@@ -80,9 +70,9 @@
     
     var chart = raw.chart()
         .title("Force-Directed Graph")
-        .description("This simple force-directed graph shows character co-occurence in Les Misérables. A physical simulation of charged particles and springs places related characters in closer proximity, while unrelated characters are farther apart.")
+        .description("A simple force-directed graph generated from a edge list, drawn with nodes as circles and edges as links between them. A physical simulation of charged particles and springs places connected nodes in closer proximity, while disconnected nodes are farther apart.")
         .thumbnail("imgs/forceDirected.png")
-        .category('Other')
+        .category('Network')
         .model(model);
 
     var width = chart.number()
@@ -95,7 +85,11 @@
     
 
     chart.draw(function(selection, data) {
-        var color = d3.scale.category20();
+    
+        var edgeWeight = d3.scale.linear()
+        	.domain([0, d3.max(data, function(d) { return d.weight; })])
+        	.range([1,10])
+        
         var margin = {top: 10, right: 30, bottom: 40, left: 30}
         selection
             .attr("width", +width() - margin.left - margin.right)
@@ -120,7 +114,9 @@
             .enter().append("line")
               .attr("stroke", "#999")
               .attr("stroke-opacity", "0.6")
-              .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+              .attr("stroke-width", function(d) {
+              	return d.weight;
+              	});
 
         var node = selection.append("g")
               .attr("class", "nodes")
@@ -128,7 +124,7 @@
             .data(data.nodes)
             .enter().append("circle")
               .attr("r", 5)
-              .attr("fill", function(d) { return color(d.group); })
+              .attr("fill", "#00F")
               .call(force.drag);
         
         node.append("text")
@@ -139,10 +135,6 @@
           .attr("fill", "#999")
           .text(function(d) { return d.name });
         
-        
-//        console.log(data.nodes);
-//        console.log(data.links);
-//        console.log(json.links);
         
         force.on("tick", function() {
             link.attr("x1", function(d) { return d.source.x; })
