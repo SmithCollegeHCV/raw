@@ -134,14 +134,14 @@ angular.module('raw.directives', [])
 	      link: function postLink(scope, element, attrs) {
 
 	        function update(){
-	        	console.log("update?");
+
 	        	$('*[data-toggle="tooltip"]').tooltip({ container:'body' });
 
 	        	d3.select(element[0]).select("*").remove();
 
 	        	if (!scope.chart || !scope.data.length) return;
 						if (!scope.model.isValid()) return;
-				console.log(scope.data)
+
 	        	d3.select(element[0])
 	        		.append("svg")
 	        		.datum(scope.data)
@@ -172,8 +172,8 @@ angular.module('raw.directives', [])
 
 	        scope.delayUpdate = dataService.debounce(update, 300, false);
 
-	        scope.$watch('chart', function(){ console.log("> chart"); update(); });
-	        scope.$on('update', function(){ console.log("> update"); update(); });
+	        scope.$watch('chart', function(){ update(); });
+	        scope.$on('update', function(){ update(); });
 	        //scope.$watch('data', update)
 	        scope.$watch(function(){ if (scope.model) return scope.model(scope.data); }, update, true);
 	        scope.$watch(function(){ if (scope.chart) return scope.chart.options().map(function (d){ return d.value }); }, scope.delayUpdate, true);
