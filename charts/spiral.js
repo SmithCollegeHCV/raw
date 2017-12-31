@@ -2,18 +2,19 @@
     // newly added
     var model = raw.model();
 
-    // Group dimension. It will mainly provide a label for each
-      // chart. If multiple lines share the same value in the
-      // group dimension, they will be grouped.
     var group = model.dimension()
-       .title('Label');
+        .title('Group')
 
-    // 'Dimensions' dimension. accept multiple values.
-    // Each value represent a slice of the pie.
-    var dimensions = model.dimension()
-       .title('Arcs')
-       .required(true)
-       .multiple(true);
+    var date = model.dimension()
+        .title('Date')
+        .types(Number, Date, String)
+        .accessor(function (d){ return this.type() == "Date" ? Date.parse(d) : this.type() == "String" ? d : +d; })
+        .required(1)
+
+    var size = model.dimension()
+        .title('Size')
+        .types(Number)
+        .required(1)
 
     // Mapping function.
     // For each record in the dataset a pie chart abstraction is created.
@@ -21,36 +22,27 @@
 
     model.map(function(data) {
 
-        // Check if dimensions are set.
-        // In theory should be not necessary, to be fixed.
-        if(dimensions() != null){
-
-          var index = 0;
-          var nest = d3.nest()
-            // If groups are not defined, assign a number to each record.
-            .key(function(d) {
-              return group() ? group(d) : ++index; })
-            .rollup(function(d) {
-              return dimensions().map(function(dimension) {
-                return { key: dimension, size: d3.sum(d, function(a) {
-                    return +a[dimension]; }) }
-              })
+        var nest = d3.nest()
+            .key(group)
+            .rollup(function (g) {
+                return g.map(function (d) {
+                    return [new Date(date(d)), +size(d)]
+                }).sort( function(a,b){return a[0] - b[0]}) //sort temporally
             })
-            .entries(data);
+            .entries(data)
 
-          return nest;
-        }
+        return nest;
 
     })
 
 
     // newly added (create chart object)
     var chart = raw.chart()
-        .title("Time Series Spiral Plot")
-        .description("Can use bars,lines or points to be displayed along the spiral path, usually used to ")
-        .thumbnail("imgs/conspiral.png") //need to add conspiral example oas png file
+        .title("Spiral Plot")
+        .description("Plots time-based data along an Archimedean spiral, beginning at the center and then progressing outwards. Ideal for drawing a compact representation of large data sets, highlighting trends over a large time period.")
+        .thumbnail("imgs/conspiral.png")
         .model(model)
-        .category('Other') // need to check what category implies for
+        .category('Time Series')
 
 
     var width = chart.number()
@@ -107,6 +99,8 @@
           .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
        var points = d3.range(start, end + 0.001, (end - start) / 1000);
+       
+       console.log("Points", points)
 
        var spiral = d3.radialLine()
           .curve(d3.curveCardinal)
@@ -123,6 +117,9 @@
        var spiralLength = path.node().getTotalLength(),
             N = 365,
             barWidth = (spiralLength / N) - 1;
+            
+       console.log("Spiral length: ", spiralLength);
+            
        var someData = [];
        for (var i = 0; i < N; i++) {
           var currentDate = new Date();
@@ -184,32 +181,32 @@
         var tF = d3.timeFormat("%b %Y"),
             firstInMonth = {};
 
-        svg.selectAll("text")
-          .data(someData)
-          .enter()
-          .append("text")
-          .attr("dy", 10)
-          .style("text-anchor", "start")
-          .style("font", "10px arial")
-          .append("textPath")
-          // only add for the first of each month
-          .filter(function(d){
-            var sd = tF(d.date);
-            if (!firstInMonth[sd]){
-              firstInMonth[sd] = 1;
-              return true;
-            }
-            return false;
-          })
-          .text(function(d){
-            return tF(d.date);
-          })
-          // place text along spiral
-          .attr("xlink:href", "#spiral")
-          .style("fill", "grey")
-          .attr("startOffset", function(d){
-            return ((d.linePer / spiralLength) * 100) + "%";
-          })
+// 		svg.selectAll("text")
+// 		  .data(someData)
+// 		  .enter()
+// 		  .append("text")
+// 		  .attr("dy", 10)
+// 		  .style("text-anchor", "start")
+// 		  .style("font", "10px arial")
+// 		  .append("textPath")
+// 		  // only add for the first of each month
+// 		  .filter(function(d){
+// 			var sd = tF(d.date);
+// 			if (!firstInMonth[sd]){
+// 			  firstInMonth[sd] = 1;
+// 			  return true;
+// 			}
+// 			return false;
+// 		  })
+// 		  .text(function(d){
+// 			return tF(d.date);
+// 		  })
+// 		  // place text along spiral
+// 		  .attr("xlink:href", "#spiral")
+// 		  .style("fill", "grey")
+// 		  .attr("startOffset", function(d){
+// 			return ((d.linePer / spiralLength) * 100) + "%";
+// 		  })
 
 
         var tooltip = d3.select("#chart")

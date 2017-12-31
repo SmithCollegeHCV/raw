@@ -34,22 +34,27 @@
         .defaultValue(400)
     
     var ticks = chart.number()
-        .title('Ticks')
+        .title('Number of Bins')
         .defaultValue(20)
     
     chart.draw(function(selection, data) {
         
         var margin = {top: 10, right: 30, bottom: 40, left: 30}
+        
         selection
             .attr("width", +width() - margin.left - margin.right)
             .attr("height", +height() - margin.bottom);
             
         g = selection.append("g");
+        
         var widthNum = +width() - margin.left - margin.right;
         var heightNum = +height() - margin.top - margin.bottom;
+        
         var formatCount = d3.format(",.0f"); 
         
-        var x = d3.scale.linear().domain([0, d3.max(data, function (d){ return d.key; })]).range([0, widthNum]);
+        var x = d3.scale.linear()
+        	.domain([0, d3.max(data, function (d){ return d.key; })])
+        	.range([0, widthNum]);
         
 
         var bins = d3.layout.histogram()

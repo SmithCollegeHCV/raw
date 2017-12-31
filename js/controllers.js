@@ -1,13 +1,6 @@
-
 'use strict';
 
 /* Controllers */
-
-
-
-
-
-
 
 angular.module('raw.controllers', [])
 
@@ -206,9 +199,7 @@ angular.module('raw.controllers', [])
       { title : 'Orchestras', type : 'Hierarchies (weighted)', url : 'data/orchestra.csv' },
       { title : 'Animal kingdom', type: 'Hierarchies', url : 'data/animals.tsv' },
       { title : 'Titanic\'s passengers', type : 'Multi categorical', url : 'data/titanic.tsv' },
-      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'},
-      { title : 'Miserable', type : 'Other', url : 'data/miserable.csv'},
-//      { title : 'Graph', type : 'Other', url : 'data/graph.json'}
+      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'}
     ]
 
     $scope.selectSample = function(sample) {
@@ -218,12 +209,7 @@ angular.module('raw.controllers', [])
       $scope.loading = true;
       dataService.loadSample(sample.url).then(
         function(data){
-          if (typeof(data) == 'string'){
-            $scope.text = data.replace(/\r/g, '');
-          }
-          else {
-              $scope.text = data;
-          }
+          $scope.text = data.replace(/\r/g, '');
           $scope.loading = false;
         },
         function(error){
@@ -405,7 +391,7 @@ angular.module('raw.controllers', [])
 
         $timeout(function() {
           $scope.charts = raw.charts.values().sort(function (a,b){ return d3.ascending(a.category(),b.category()) || d3.ascending(a.title(),b.title()) })
-          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Circle Packing'})[0]; //Sets default selection
+          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Scatter Plot'})[0];
           $scope.model = $scope.chart ? $scope.chart.model() : null;
         });
       } catch(e){
@@ -447,92 +433,10 @@ angular.module('raw.controllers', [])
       })
     })
 
-    $('body').mousedown(function (e,ui){
-
-      var previous_attributes;
-      if ($(e.target).hasClass("CodeMirror-line") || $(e.target).parent().hasClass("CodeMirror-line") ) {
-        let text = "";
-        if ($(e.target)[0].innerText){
-          text = $(e.target)[0].innerText;
-        }else{
-          text = e.innerText;
-        }
-        var split = text.split(",")
-        var circles = d3.selectAll("circle").filter(function(d){ if (d.name == split[0]) return d;});
-        //previous_attributes = circles.
-            circles
-              .style("fill", "green");
-        // console.log($scope.chart)
-        // console.log(text);
-        // console.log(circles.data())
-        // return;
-      }
-
-      //$scope.charts-open = true;
-      $scope.$watch('chart_toggle', function(){
-        $scope.chart_toggle_text = $scope.chart_toggle ? 'Hide Charts' : 'Show Charts';
-      })
-      $scope.$watch('dimension_toggle', function(){
-        $scope.dimension_toggle_text = $scope.dimension_toggle ? 'Hide Dimensions' : 'Show Dimensions';
-      })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      // var $divs = $(".CodeMirror-code").children();
-      var observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-              if (mutation.attributeName === "class") {
-                  var attributeValue = $(mutation.target).prop(mutation.attributeName);
-                  //console.log("Class attribute changed to:", attributeValue);
-                  if (attributeValue == "CodeMirror-activeline"){
-                    console.log(mutation.target);
-                  }
-                  
-                  //if (attributeValue == "CodeMirror-activeline")
-              }
-          });
-      });    
-      observer.observe(document,  {attributes: true, subtree: true});
-
-
-
-
-
-
-
-
-
-
-
-      // $('.dimensions-wrapper').each(function (e){
-      //   angular.element(this).scope().open = false;
-      //   angular.element(this).scope().$apply();
-      // })
-    });
-    // $('body').on('change','.CodeMirror-activeline',function(){
-    //   console.log("foundActiveLineEvent");
-    // })
-
     $scope.codeMirrorOptions = {
       dragDrop : false,
-      lineNumbers : false,
-      lineWrapping : true,
-      styleActiveLine: true
+      lineNumbers : true,
+      lineWrapping : true
     }
 
     $scope.selectChart = function(chart){
@@ -540,6 +444,8 @@ angular.module('raw.controllers', [])
       $scope.model.clear();
       $scope.chart = chart;
       $scope.model = $scope.chart.model();
+      console.log($scope.chart.title());
+      console.log($scope.model($scope.data));
     }
 
     function refreshScroll(){

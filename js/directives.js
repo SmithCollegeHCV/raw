@@ -134,7 +134,6 @@ angular.module('raw.directives', [])
 	      link: function postLink(scope, element, attrs) {
 
 	        function update(){
-
 	        	$('*[data-toggle="tooltip"]').tooltip({ container:'body' });
 
 	        	d3.select(element[0]).select("*").remove();
@@ -152,6 +151,7 @@ angular.module('raw.directives', [])
 													scope.chart.isDrawing(true)
                    				scope.$apply()
                   	}
+							console.log(scope.chart)
 									})
 									.on('endDrawing', function(){
 										$rootScope.$broadcast("completeGraph");
@@ -161,6 +161,7 @@ angular.module('raw.directives', [])
 										}
 									})
 							)
+
 	    			scope.svgCode = d3.select(element[0])
 	        			.select('svg')
 	    				.attr("xmlns", "http://www.w3.org/2000/svg")
@@ -172,8 +173,8 @@ angular.module('raw.directives', [])
 
 	        scope.delayUpdate = dataService.debounce(update, 300, false);
 
-	        scope.$watch('chart', function(){ update(); });
-	        scope.$on('update', function(){ update(); });
+	        scope.$watch('chart', function(){ console.log("> chart"); update(); });
+	        scope.$on('update', function(){ console.log("> update"); update(); });
 	        //scope.$watch('data', update)
 	        scope.$watch(function(){ if (scope.model) return scope.model(scope.data); }, update, true);
 	        scope.$watch(function(){ if (scope.chart) return scope.chart.options().map(function (d){ return d.value }); }, scope.delayUpdate, true);
@@ -256,17 +257,11 @@ angular.module('raw.directives', [])
 	        function ordinalUpdate(domain) {
 	        	if (!domain.length) domain = [null];
 	        	this.value.domain(domain);
-	        	
-	        	//console.log(scope.model.dimensions())
-	        	//console.log(scope.data)
 	        	listColors();
 	        }
 
 	        function linearUpdate(domain) {
-
 	        	domain = d3.extent(domain, function (d){return +d; });
-	        	console.log(scope)
-	        	console.log(domain);
 	        	if (domain[0]==domain[1]) domain = [null];
 	        	this.value.domain(domain).interpolate(d3.interpolateLab);
 	        	listColors();
@@ -290,7 +285,6 @@ angular.module('raw.directives', [])
 
 	        scope.$watch('chart', addListener)
 					scope.$watch('colorScale.value.domain()',function (domain){
-						
 						scope.colorScale.reset(domain);
 						listColors();
 					}, true);
@@ -305,7 +299,6 @@ angular.module('raw.directives', [])
 	        }
 
 	        scope.setColor = function(key, color) {
-	        	console.log(scope.data)
 	          var domain = scope.colorScale.value.domain(),
 	          		index = domain.indexOf(key),
 	          		range = scope.colorScale.value.range();
@@ -510,6 +503,7 @@ angular.module('raw.directives', [])
 
 
 .directive('rawTable', function () {
+  console.log("in directive");
   return {
     restrict: 'A',
     link: function postLink(scope, element, attrs) {
@@ -517,8 +511,8 @@ angular.module('raw.directives', [])
     	var sortBy,
     			descending = true;
 
-    	function update(){ //Updates table
-    		
+    	function update(){
+
     		d3.select(element[0]).selectAll("*").remove();
 
     		if(!scope.data|| !scope.data.length) {
@@ -532,12 +526,12 @@ angular.module('raw.directives', [])
 
     		if (!sortBy) sortBy = scope.metadata[0].key;
 
-    		var headers = table.append("thead") //table headers
+    		var headers = table.append("thead")
     			.append("tr")
 					.selectAll("th")
 					.data(scope.metadata)
 					.enter().append("th")
-						.text( function(d){ return d.key; } ) //table header text
+						.text( function(d){ return d.key; } )
 						.on('click', function (d){
 							descending = sortBy == d.key ? !descending : descending;
 							sortBy = d.key;
@@ -557,9 +551,6 @@ angular.module('raw.directives', [])
 					.data(d3.values)
 					.enter().append("td");
 					cells.text(String);
-				for (var i = 0; i<element.length;i++){
-					console.log(element[i]);
-				}
 
     	}
 
@@ -567,15 +558,7 @@ angular.module('raw.directives', [])
     		if (raw.isNumber(a[sortBy]) && raw.isNumber(b[sortBy])) return descending ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy];
 	      return descending ? a[sortBy] < b[sortBy] ? -1 : a[sortBy] > b[sortBy] ? 1 : 0 : a[sortBy] < b[sortBy] ? 1 : a[sortBy] > b[sortBy] ? -1 : 0;
     	}
-    	    ///
-	    scope.$watch(function() {return element.attr('Class'); }, function(newValue){
-	      console.log("changed highlight")
-	    });
-	    	    ///
-	    // $scope.$watch(function() {return element.attr('.CodeMirror-activeline'); }, function(newValue){
-	    //   console.log("changed highlight")
-	    // });
-	    ///
+
     	scope.$watch('data', update);
     	scope.$watch('metadata', function(){
     		sortBy = null;
@@ -630,6 +613,7 @@ angular.module('raw.directives', [])
         	.node().parentNode.innerHTML;
 
     		element.find('textarea').val(svgCode)
+		// element.find('textarea').val("SOME SILLY CODE HERE")
     	})
 
       /*function asHTML(){
@@ -746,17 +730,93 @@ angular.module('raw.directives', [])
 }
 
       var downloadData = function() {
+		console.log(scope.model);
         var json = JSON.stringify(scope.model(scope.data));
         var blob = new Blob([json], { type: "data:text/json;charset=utf-8" });
         saveAs(blob, (scope.filename || element.find('input').attr("placeholder")) + ".json")
       }
 
+		/* This function extracts the d3 code for a specific chart when given the
+		title of the chart. */
+		var findFileFromName = function(name) {
+			if (name == "Alluvial Diagram") {
+				return "alluvial.js";
+			}
+			if (name == "Delaunay Triangulation") {
+				return "delaunay.js";
+			}
+			if (name == "Circle Packing") {
+				return "packing.js";
+			}
+			if (name == "Voronoi Tessellation") {
+				return "voronoi.js";
+			}
+			var sep_strings = name.split(" ");
+			var first = sep_strings[0].toLowerCase();
+			sep_strings[0] = first;
+			var final = "";
+			for (var i = 0; i<sep_strings.length; i++) {
+				final = final + sep_strings[i];
+			}
+			final = final + ".js";
+
+			return final;
+		}
+
+		/* This function cleans the code of the chart. */
+		var cleanCode = function(chartName, data) {
+			var toReplace = [/^\(function\(\){/, /.*chart\.draw\(\s*function\s*\(\s*selection\s*\,\s*data\s*\){/, "selection", /\s*}\)\s*}\)\(\);/];
+			var newText = ["", "", `d3.select("body").append("svg")`, ""];
+
+			//loop through all replacements
+			for (var i=0; i<toReplace.length; i++) {
+				data = data.replace(toReplace[i], newText[i]);
+			}
+			return data;
+		}
+
+		/* This function downloads the generated HTML. */
+		var downloadD3 = function() {
+
+			var filename = findFileFromName(scope.chart.title());
+			var chartPath = "../charts/" + filename;
+			$.getScript(chartPath, function(data) {
+				var dataModel = "var data = " + JSON.stringify(scope.model(scope.data));
+				var chartingFunction = cleanCode(scope.chart.title(), data);
+				var javascriptFunctions =
+					"\n" + dataModel + ";\n\n" + chartingFunction +"\n";
+
+				//create the HTML template
+				var htmlTemplate =
+				`<!DOCTYPE html>
+				<html>
+				 <head>
+				 <!-- This code assumes you have an internet connection. If you do not,
+				 you will need to replace the following two lines of code that begin with
+				 "script".
+				 Replace the first line with your local copy of the d3 library.
+				 Replace the second line with your local copy of raw.js. -->
+				    <script src="https://d3js.org/d3.v3.min.js"></script>
+					 <script src="http://www.science.smith.edu/~jcrouser/raw/lib/raw.js"></script>
+				 </head>
+				 <body>
+				    <script>` + javascriptFunctions + `</script>
+				 </body>
+				</html>`;
+
+				var blob = new Blob([htmlTemplate], {type:'text/plain'});
+				saveAs(blob, (scope.filename || element.find('input').attr("placeholder")) + ".html")
+			});
+
+
+		}
+
       scope.modes = [
     		{ label : 'Vector graphics (svg)', download : downloadSvg },
     		{ label : 'Image (png)', download : downloadPng },
-    		{ label : 'Data model (json)', download : downloadData }
+    		{ label : 'Data model (json)', download : downloadData },
+			{ label: 'HTML/JS', download : downloadD3 }
     	]
-    	//scope.mode = scope.modes[0]
 
     }
   };
